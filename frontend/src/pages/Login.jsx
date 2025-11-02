@@ -11,7 +11,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/users/login", formData);
+      const res = await axios.post("https://college-event-management-system-dvr3.onrender.com", formData);
       const user = res.data.user;
       localStorage.setItem("user", JSON.stringify(user));
       alert("Login successful!");
