@@ -14,6 +14,7 @@ app.use('/api/users', userRoutes);
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
 const PORT = process.env.PORT || 5000;
+const MONGO = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/clubEventDB';
 
 mongoose.connect(MONGO, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
