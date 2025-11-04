@@ -1,0 +1,270 @@
+/* ==== Layout ==== */
+.student-dashboard {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0f3f7, #e8edf3);
+  color: #1a1f36;
+  font-family: "Poppins", sans-serif;
+}
+
+/* ==== Sidebar ==== */
+.sidebar {
+  width: 270px;
+  background: linear-gradient(180deg, #0b1d39, #122b4d);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 30px 20px;
+}
+
+.sidebar h2 {
+  font-size: 22px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  flex-grow: 1;
+}
+
+.sidebar ul li {
+  padding: 14px 18px;
+  margin-bottom: 15px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.sidebar ul li.active,
+.sidebar ul li:hover {
+  background-color: #233b68;
+  color: #fff;
+}
+
+/* ==== Logout Button ==== */
+.logout-btn {
+  margin-top: auto;
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  width: 100%;
+  transition: background-color 0.3s;
+}
+
+.logout-btn:hover {
+  background-color: #c9302c;
+}
+
+/* ==== Main Content ==== */
+.content {
+  flex: 1;
+  padding: 40px;
+  background: linear-gradient(135deg, #eef3f9, #e1e8f0);
+  overflow-y: auto;
+}
+
+.content h2 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #0d2447;
+  margin-bottom: 25px;
+}
+
+/* ==== Cards ==== */
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 25px;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 15px;
+  padding: 25px;
+  width: 370px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.card h3 {
+  color: #0d2447;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.card p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #2e3b55;
+}
+
+/* ==== Buttons ==== */
+.card-actions {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.card-actions button {
+  background-color: #0b57d0;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.card-actions button:hover {
+  background-color: #003c9f;
+}
+
+/* ==== Modal Overlay ==== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+/* ==== Modal Box ==== */
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  padding: 30px;
+  max-width: 480px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal h2 {
+  color: #0d2447;
+  margin-bottom: 15px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* ==== Modal Form ==== */
+.modal form {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal form label {
+  font-size: 14px;
+  color: #1a1f36;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.modal form input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+/* ==== Sticky Buttons (Always Visible) ==== */
+.modal-buttons {
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding-top: 10px;
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid #ddd;
+}
+
+.modal-buttons button {
+  background-color: #0b57d0;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.modal-buttons button:hover {
+  background-color: #003c9f;
+}
+
+/* Cancel button styling */
+.modal-buttons button.cancel-btn {
+  background-color: #d9534f;
+}
+
+.modal-buttons button.cancel-btn:hover {
+  background-color: #c9302c;
+}
+
+/* ==== Responsive ==== */
+@media (max-width: 768px) {
+  .student-dashboard {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .sidebar ul {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .content {
+    padding: 20px;
+  }
+
+  .card {
+    width: 100%;
+  }
+}

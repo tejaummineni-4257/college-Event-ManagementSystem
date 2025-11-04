@@ -1,351 +1,280 @@
-import React, { useState } from "react";
-import "../App.css";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { fetchEvents, fetchNews, fetchNotices, fetchClubs } from "../api/api";
+import "../StudentDashboard.css";
 
 const StudentDashboard = () => {
-  const [openSection, setOpenSection] = useState(null);
-  const [openClub, setOpenClub] = useState(null);
-  const [openEvent, setOpenEvent] = useState(null);
-  const [showClubDetails, setShowClubDetails] = useState(null);
-  const [showEventDetails, setShowEventDetails] = useState(null);
-  const [registerClub, setRegisterClub] = useState(null);
-  const [registerEvent, setRegisterEvent] = useState(null);
+  const [activeTab, setActiveTab] = useState("events");
+  const [data, setData] = useState([]);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [eventToRegister, setEventToRegister] = useState(null);
+  const [form, setForm] = useState({
+    fullName: "",
+    email: "",
+    regno: "",
+    department: "",
+    year: "",
+    section: "",
+  });
 
-  const handleSectionToggle = (section) => {
-    setOpenSection(openSection === section ? null : section);
-    setOpenClub(null);
-    setOpenEvent(null);
-    setShowClubDetails(null);
-    setShowEventDetails(null);
-    setRegisterClub(null);
-    setRegisterEvent(null);
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  // ✅ Load data dynamically based on tab
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        let res;
+        switch (activeTab) {
+          case "events":
+            res = await fetchEvents();
+            break;
+          case "news":
+            res = await fetchNews();
+            break;
+          case "notices":
+            res = await fetchNotices();
+            break;
+          case "clubs":
+            res = await fetchClubs();
+            break;
+          default:
+            return;
+        }
+        setData(res.data || []);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    loadData();
+  }, [activeTab]);
+
+  // ✅ Show details modal
+  const handleDetails = (item) => {
+    setSelectedItem(item);
+    setShowDetailsModal(true);
   };
 
-  const clubs = [
-    {
-      id: 1,
-      name: "Robotics Club",
-      icon: "🤖",
-      details: [
-        "Weekly meetings every Tuesday at 4 PM in Lab 2.",
-        "Upcoming Event: Robot Design Contest (Nov 22).",
-      ],
-    },
-    {
-      id: 2,
-      name: "Drama Club",
-      icon: "🎭",
-      details: [
-        "Practice sessions every Wednesday at 5 PM in Auditorium.",
-        "Upcoming: Winter Stage Play rehearsals.",
-      ],
-    },
-    {
-      id: 3,
-      name: "Music Club",
-      icon: "🎵",
-      details: [
-        "Jam sessions every Friday in Music Room.",
-        "Upcoming: Acoustic Night (Dec 5).",
-      ],
-    },
-    {
-      id: 4,
-      name: "Sports Club",
-      icon: "⚽",
-      details: [
-        "Practice sessions on weekends.",
-        "Upcoming: Cricket, Volleyball & Chess tournaments.",
-      ],
-    },
-  ];
+  // ✅ Open register modal (only for events/clubs)
+  const handleOpenRegister = (item) => {
+    if (activeTab === "news" || activeTab === "notices") return;
+    setEventToRegister(item);
+    setShowRegisterModal(true);
+  };
 
-  const events = [
-    {
-      id: 1,
-      title: "TechFest 2025 🚀",
-      date: "Nov 15, 2025",
-      location: "Main Auditorium",
-      details:
-        "A grand event with coding contests, tech talks, and innovation exhibitions.",
-    },
-    {
-      id: 2,
-      title: "Cultural Night 🎭",
-      date: "Dec 10, 2025",
-      location: "Open Ground",
-      details:
-        "An evening of music, dance, and art celebrating diversity and creativity.",
-    },
-    {
-      id: 3,
-      title: "Sports Meet 2026 🏅",
-      date: "Jan 8, 2026",
-      location: "College Stadium",
-      details:
-        "Annual sports event with athletics, cricket, football, and more.",
-    },
-  ];
+  // ✅ Handle input change
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
-  const academicSchedule = [
-    {
-      id: 1,
-      title: "Mid-Sem Exams",
-      date: "Nov 20 - Nov 25, 2025",
-      info: "Examinations will cover all core subjects. Check timetable on the notice board.",
-    },
-    {
-      id: 2,
-      title: "Project Submission",
-      date: "Dec 10, 2025",
-      info: "Final year students must submit project reports via the online portal.",
-    },
-    {
-      id: 3,
-      title: "Winter Break",
-      date: "Dec 24, 2025 - Jan 2, 2026",
-      info: "Enjoy your winter vacation! College reopens on Jan 3, 2026.",
-    },
-  ];
+  // ✅ Register (mock only)
+  const handleRegisterSubmit = (e) => {
+    e.preventDefault();
+    alert(`✅ You have successfully registered for "${eventToRegister?.title}"`);
+    setShowRegisterModal(false);
+    setForm({
+      fullName: "",
+      email: "",
+      regno: "",
+      department: "",
+      year: "",
+      section: "",
+    });
+  };
+
+  // ✅ Logout
+  const handleLogout = () => {
+    if (window.confirm("Are you sure you want to logout?")) {
+      alert("You have successfully logged out!");
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      navigate("/login");
+    }
+  };
 
   return (
-    <div className="dashboard">
-      <header className="dashboard-header">
-        <h1>🎓 Student Dashboard</h1>
-        <p>Welcome to your student portal — stay updated!</p>
-      </header>
+    <div className="student-dashboard">
+      {/* Sidebar */}
+      <div className="sidebar">
+        <h2>🎓 Student Dashboard</h2>
+        <ul>
+          {["events", "news", "notices", "clubs"].map((tab) => (
+            <li
+              key={tab}
+              className={activeTab === tab ? "active" : ""}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab.toUpperCase()}
+            </li>
+          ))}
+        </ul>
 
-      {/* 📰 NEWS */}
-      <section
-        className={`dashboard-section news ${openSection === "news" ? "open" : ""}`}
-        onClick={() => handleSectionToggle("news")}
-      >
-        <h2 className="section-title">
-          <span className="icon news-icon">📰</span> News
-        </h2>
-        {openSection === "news" && (
-          <ul>
-            <li>New semester begins on <strong>Nov 10, 2025</strong>.</li>
-            <li>Library timings updated to <strong>8AM - 8PM</strong>.</li>
-            <li>New AI lab inaugurated in Block B.</li>
-          </ul>
-        )}
-      </section>
+        <button className="logout-btn" onClick={handleLogout}>
+          🚪 Logout
+        </button>
+      </div>
 
-      {/* 📢 NOTICES */}
-      <section
-        className={`dashboard-section notices ${openSection === "notices" ? "open" : ""}`}
-        onClick={() => handleSectionToggle("notices")}
-      >
-        <h2 className="section-title">
-          <span className="icon notice-icon">📢</span> Notices
-        </h2>
-        {openSection === "notices" && (
-          <ul>
-            <li>Assignment submissions due by <strong>Nov 5</strong>.</li>
-            <li>Mid-sem exams from <strong>Nov 20 - Nov 25</strong>.</li>
-            <li>Sports registration closes on <strong>Nov 8</strong>.</li>
-          </ul>
-        )}
-      </section>
+      {/* Main Content */}
+      <div className="content">
+        <h2>{activeTab.toUpperCase()}</h2>
 
-      {/* 🏫 CLUBS */}
-      <section
-        className={`dashboard-section clubs ${openSection === "clubs" ? "open" : ""}`}
-        onClick={() => handleSectionToggle("clubs")}
-      >
-        <h2 className="section-title">
-          <span className="icon club-icon">🏫</span> Clubs
-        </h2>
+        {data.length === 0 ? (
+          <p>No {activeTab} available.</p>
+        ) : (
+          <div className="card-container">
+            {data.map((item) => (
+              <div key={item._id} className="card">
+                <h3>{item.title}</h3>
+                <p>{item.description}</p>
 
-        {openSection === "clubs" && (
-          <div className="clubs-list">
-            {clubs.map((club) => (
-              <div
-                key={club.id}
-                className={`club-item ${openClub === club.id ? "active" : ""}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setOpenClub(club.id);
-                }}
-              >
-                <div className="club-header">
-                  <span className="club-icon-inner">{club.icon}</span> {club.name}
-                </div>
-
-                {openClub === club.id && (
-                  <div className="club-actions">
-                    <button
-                      className="register-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowClubDetails(club.id);
-                        setRegisterClub(null);
-                      }}
-                    >
-                      Details
-                    </button>
-                    <button
-                      className="register-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setRegisterClub(club.id);
-                        setShowClubDetails(null);
-                      }}
-                    >
-                      Register
-                    </button>
-
-                    {showClubDetails === club.id && (
-                      <div className="club-details">
-                        {club.details.map((line, i) => (
-                          <p key={i}>{line}</p>
-                        ))}
-                      </div>
-                    )}
-
-                    {registerClub === club.id && (
-                      <form
-                        className="register-form"
-                        onClick={(e) => e.stopPropagation()}
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          alert(`✅ Registration successful for ${club.name}!`);
-                        }}
-                      >
-                        <input type="text" placeholder="Full Name" required />
-                        <input type="text" placeholder="Reg Number" required />
-                        <input type="email" placeholder="Email Address" required />
-                        <input type="text" placeholder="Section" required />
-                        <select required>
-                          <option value="">Select Year</option>
-                          <option>1st Year</option>
-                          <option>2nd Year</option>
-                          <option>3rd Year</option>
-                          <option>4th Year</option>
-                        </select>
-                        <button type="submit" className="register-submit-btn">
-                          Submit
-                        </button>
-                      </form>
-                    )}
-                  </div>
+                {activeTab === "events" && (
+                  <p>
+                    📅 {item.date || "N/A"} | ⏰ {item.time || "N/A"} | 📍{" "}
+                    {item.location || "TBD"}
+                  </p>
                 )}
+
+                {activeTab === "clubs" && (
+                  <>
+                    {item.details && <p>{item.details}</p>}
+                    {item.nextMeet && <p>🎯 Next Meet: {item.nextMeet}</p>}
+                  </>
+                )}
+
+                <div className="card-actions">
+                  <button onClick={() => handleDetails(item)}>ℹ️ Details</button>
+
+                  {/* ✅ Show Register button only for Events & Clubs */}
+                  {(activeTab === "events" || activeTab === "clubs") && (
+                    <button onClick={() => handleOpenRegister(item)}>
+                      📝 Register
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
         )}
-      </section>
+      </div>
 
-      {/* 📅 ACADEMIC CALENDAR */}
-      <section
-        className={`dashboard-section calendar ${openSection === "calendar" ? "open" : ""}`}
-        onClick={() => handleSectionToggle("calendar")}
-      >
-        <h2 className="section-title">
-          <span className="icon calendar-icon">📅</span> Academic Calendar
-        </h2>
+      {/* DETAILS MODAL */}
+      {showDetailsModal && selectedItem && (
+        <div
+          className="modal-overlay"
+          onClick={() => setShowDetailsModal(false)}
+        >
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h2>{selectedItem.title}</h2>
+            <p>{selectedItem.description}</p>
+            {selectedItem.date && <p>📅 Date: {selectedItem.date}</p>}
+            {selectedItem.time && <p>⏰ Time: {selectedItem.time}</p>}
+            {selectedItem.location && (
+              <p>📍 Location: {selectedItem.location}</p>
+            )}
+            {selectedItem.details && <p>📝 {selectedItem.details}</p>}
 
-        {openSection === "calendar" && (
-          <div className="calendar-list">
-            {academicSchedule.map((item) => (
-              <div key={item.id} className="calendar-item">
-                <h4>📘 {item.title}</h4>
-                <p><strong>🗓 Date:</strong> {item.date}</p>
-                <p>{item.info}</p>
-              </div>
-            ))}
+            <div className="modal-buttons">
+              {/* ✅ Only show Register button for Events & Clubs */}
+              {(activeTab === "events" || activeTab === "clubs") && (
+                <button onClick={() => handleOpenRegister(selectedItem)}>
+                  📝 Register Now
+                </button>
+              )}
+              <button onClick={() => setShowDetailsModal(false)}>❌ Close</button>
+            </div>
           </div>
-        )}
-      </section>
+        </div>
+      )}
 
-      {/* 🎉 EVENTS */}
-      <section
-        className={`dashboard-section events ${openSection === "events" ? "open" : ""}`}
-        onClick={() => handleSectionToggle("events")}
-      >
-        <h2 className="section-title">
-          <span className="icon event-icon">🎉</span> Upcoming Events
-        </h2>
+      {/* REGISTER MODAL */}
+      {showRegisterModal && (
+        <div
+          className="modal-overlay"
+          onClick={() => setShowRegisterModal(false)}
+        >
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h2>
+              Register for{" "}
+              {activeTab === "events" ? "🎉 " : "🎯 "}
+              {eventToRegister?.title}
+            </h2>
+            <form onSubmit={handleRegisterSubmit}>
+              <div>
+                <label>Full Name:</label>
+                <input
+                  type="text"
+                  name="fullName"
+                  value={form.fullName}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div>
+                <label>Email:</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div>
+                <label>Register No:</label>
+                <input
+                  type="text"
+                  name="regno"
+                  value={form.regno}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div>
+                <label>Department / Branch:</label>
+                <input
+                  type="text"
+                  name="department"
+                  value={form.department}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div>
+                <label>Year:</label>
+                <input
+                  type="text"
+                  name="year"
+                  value={form.year}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div>
+                <label>Section:</label>
+                <input
+                  type="text"
+                  name="section"
+                  value={form.section}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-        {openSection === "events" && (
-          <div className="events-list">
-            {events.map((event) => (
-              <div
-                key={event.id}
-                className={`event-item ${openEvent === event.id ? "active" : ""}`}
-              >
-                <div
-                  className="event-header"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setOpenEvent(event.id);
-                  }}
+              <div className="modal-buttons">
+                <button type="submit">📝 Register</button>
+                <button
+                  type="button"
+                  onClick={() => setShowRegisterModal(false)}
                 >
-                  <span className="event-icon-inner">🎊</span> {event.title} — {event.date}
-                </div>
-
-                {openEvent === event.id && (
-                  <div className="event-actions">
-                    <button
-                      className="register-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowEventDetails(event.id);
-                        setRegisterEvent(null);
-                      }}
-                    >
-                      Details
-                    </button>
-                    <button
-                      className="register-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setRegisterEvent(event.id);
-                        setShowEventDetails(null);
-                      }}
-                    >
-                      Register
-                    </button>
-
-                    {showEventDetails === event.id && (
-                      <div className="event-details">
-                        <p><strong>📍 Location:</strong> {event.location}</p>
-                        <p>{event.details}</p>
-                      </div>
-                    )}
-
-                    {registerEvent === event.id && (
-                      <form
-                        className="register-form"
-                        onClick={(e) => e.stopPropagation()}
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          alert(`✅ Registered successfully for ${event.title}!`);
-                        }}
-                      >
-                        <input type="text" placeholder="Full Name" required />
-                        <input type="text" placeholder="Reg Number" required />
-                        <input type="email" placeholder="Email Address" required />
-                        <input type="text" placeholder="Section" required />
-                        <select required>
-                          <option value="">Select Year</option>
-                          <option>1st Year</option>
-                          <option>2nd Year</option>
-                          <option>3rd Year</option>
-                          <option>4th Year</option>
-                        </select>
-                        <button type="submit" className="register-submit-btn">
-                          Submit
-                        </button>
-                      </form>
-                    )}
-                  </div>
-                )}
+                  ❌ Cancel
+                </button>
               </div>
-            ))}
+            </form>
           </div>
-        )}
-      </section>
+        </div>
+      )}
     </div>
   );
 };

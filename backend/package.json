@@ -4,11 +4,10 @@
   "description": "Backend for Club Event Management System",
   "main": "server.js",
   "scripts": {
-  "start": "node backend/server.js",
-  "dev": "nodemon backend/server.js",
-  "seed": "node sample/sampleData.js"
-},
-
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "seed": "node sample/sampleData.js"
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",

@@ -6,7 +6,7 @@ const Home = () => {
   return (
     <div className="home-page">
       <nav className="navbar">
-        <h1>🎓 College Event</h1>
+        <h1 className="logo">🎓 College Event Management</h1>
         <div className="nav-links">
           <Link to="/login" className="nav-btn">Login</Link>
           <Link to="/register" className="nav-btn">Register</Link>

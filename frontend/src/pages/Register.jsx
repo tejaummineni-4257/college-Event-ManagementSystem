@@ -1,127 +1,118 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { registerUser } from "../api/api";
-import "../App.css";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import "../Auth.css";
 
 const Register = () => {
-  const navigate = useNavigate();
-
-  // ✅ include role in state
   const [formData, setFormData] = useState({
-    fullName: "",
     username: "",
+    fullName: "",
     email: "",
     phone: "",
     password: "",
     confirmPassword: "",
-    role: "student", // default role
+    role: "student",
   });
 
-  // ✅ update state when input changes
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const navigate = useNavigate();
 
-  // ✅ handle form submission
+  // handle input change
+  const handleChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  // handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
-      return;
-    }
-
     try {
-      const res = await registerUser(formData);
+      const res = await axios.post(
+        "https://college-event-management-system-dvr3.onrender.com/api/users/register",
+        formData
+      );
 
-      if (res && res.status === 201) {
-        alert("Registration Successful!");
-        navigate("/login");
-      } else {
-        alert(res?.data?.message || "Registration Failed!");
-      }
+      alert(res.data.message || "✅ Registration successful!");
+      navigate("/login");
     } catch (err) {
-      console.error("Error during registration:", err);
-      alert("Registration Failed! Check console for details.");
+      console.error("Error during registration:", err.response?.data || err);
+      alert(err.response?.data?.message || "❌ Registration failed. Try again.");
     }
   };
 
   return (
     <div className="auth-page">
       <div className="auth-container">
-        <h2>Register</h2>
+        <h2 className="welcome-text">📝 Create Your Account</h2>
+
         <form className="auth-form" onSubmit={handleSubmit}>
           <input
-            type="text"
-            name="fullName"
-            placeholder="Full Name"
-            value={formData.fullName}
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="text"
             name="username"
-            placeholder="Username"
+            type="text"
+            placeholder="Choose a username"
             value={formData.username}
             onChange={handleChange}
             required
           />
+
           <input
-            type="email"
+            name="fullName"
+            type="text"
+            placeholder="Enter your full name"
+            value={formData.fullName}
+            onChange={handleChange}
+            required
+          />
+
+          <input
             name="email"
-            placeholder="Email"
+            type="email"
+            placeholder="Enter your email"
             value={formData.email}
             onChange={handleChange}
             required
           />
+
           <input
-            type="text"
             name="phone"
-            placeholder="Phone Number"
+            type="tel"
+            placeholder="Enter your phone number"
             value={formData.phone}
             onChange={handleChange}
             required
           />
+
           <input
-            type="password"
             name="password"
-            placeholder="Password"
+            type="password"
+            placeholder="Create password"
             value={formData.password}
             onChange={handleChange}
             required
           />
+
           <input
-            type="password"
             name="confirmPassword"
-            placeholder="Confirm Password"
+            type="password"
+            placeholder="Confirm password"
             value={formData.confirmPassword}
             onChange={handleChange}
             required
           />
 
-          {/* ✅ Role selection dropdown */}
-          <select
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            required
-            className="role-select"
-          >
-            <option value="student">🎓 Student</option>
-            <option value="admin">🧑‍💼 Admin</option>
+          <select name="role" value={formData.role} onChange={handleChange}>
+            <option value="student">Student</option>
+            <option value="admin">Admin</option>
           </select>
 
-          <button type="submit">Register</button>
+          <button type="submit" className="login-btn">
+            Register
+          </button>
         </form>
 
         <div className="auth-footer">
-          <p>
-            Already have an account?{" "}
-            <Link to="/login" style={{ color: "#3498db" }}>
-              Login
-            </Link>
-          </p>
+          Already have an account?{" "}
+          <Link to="/login" className="register-link">
+            <strong>Login</strong>
+          </Link>
         </div>
       </div>
     </div>

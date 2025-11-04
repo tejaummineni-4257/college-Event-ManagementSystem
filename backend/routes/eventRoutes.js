@@ -3,8 +3,8 @@ import { getEvents, addEvent, deleteEvent } from "../controllers/eventController
 
 const router = express.Router();
 
-router.get("/", getEvents);
-router.post("/", addEvent);
-router.delete("/:id", deleteEvent);
+router.get("/", getEvents);        // GET /api/events
+router.post("/", addEvent);        // POST /api/events
+router.delete("/:id", deleteEvent); // DELETE /api/events/:id
 
 export default router;
