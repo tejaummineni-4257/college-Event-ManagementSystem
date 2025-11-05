@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import { FaGraduationCap, FaEnvelope, FaLock, FaUserShield, FaSignInAlt } from "react-icons/fa";
 import "../Auth.css"; // styling file
 
 const Login = () => {
@@ -40,34 +41,47 @@ const Login = () => {
   return (
     <div className="auth-page">
       <div className="auth-container">
-        <h2 className="welcome-text">🎓 Welcome Back!</h2>
+        <div className="auth-header">
+          <FaGraduationCap className="auth-icon" />
+          <h2 className="auth-title">Welcome Back!</h2>
+          <p className="auth-subtitle">Sign in to access your student portal</p>
+        </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>
-          <input
-            name="email"
-            type="email"
-            placeholder="Enter your email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
+          <div className="input-group">
+            <FaEnvelope className="input-icon" />
+            <input
+              name="email"
+              type="email"
+              placeholder="Enter your email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-          <input
-            name="password"
-            type="password"
-            placeholder="Enter your password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
+          <div className="input-group">
+            <FaLock className="input-icon" />
+            <input
+              name="password"
+              type="password"
+              placeholder="Enter your password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-          <select name="role" value={formData.role} onChange={handleChange}>
-            <option value="student">Student</option>
-            <option value="admin">Admin</option>
-          </select>
+          <div className="input-group">
+            <FaUserShield className="input-icon" />
+            <select name="role" value={formData.role} onChange={handleChange}>
+              <option value="student">Student</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
 
-          <button type="submit" className="login-btn">
-            Login
+          <button type="submit" className="auth-btn">
+            <FaSignInAlt /> Login
           </button>
         </form>
 

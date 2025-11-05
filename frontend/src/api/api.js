@@ -25,3 +25,15 @@ export const deleteEvent = (id) => axios.delete(`${API_URL}/events/${id}`);
 export const deleteNews = (id) => axios.delete(`${API_URL}/news/${id}`);
 export const deleteNotice = (id) => axios.delete(`${API_URL}/notices/${id}`);
 export const deleteClub = (id) => axios.delete(`${API_URL}/clubs/${id}`);
+
+// ✅ Student Registrations
+export const createRegistration = (registrationData) =>
+  axios.post(`${API_URL}/registrations`, registrationData);
+
+export const fetchRegistrations = () => axios.get(`${API_URL}/registrations`);
+
+export const updateRegistrationStatus = (id, status) =>
+  axios.put(`${API_URL}/registrations/${id}`, { status });
+
+export const deleteRegistration = (id) =>
+  axios.delete(`${API_URL}/registrations/${id}`);

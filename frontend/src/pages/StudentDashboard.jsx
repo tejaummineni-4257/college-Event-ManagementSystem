@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchEvents, fetchNews, fetchNotices, fetchClubs } from "../api/api";
+import { fetchEvents, fetchNews, fetchNotices, fetchClubs, createRegistration } from "../api/api";
 import "../StudentDashboard.css";
 
 const StudentDashboard = () => {
@@ -69,19 +69,35 @@ const StudentDashboard = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // ✅ Register (mock only)
-  const handleRegisterSubmit = (e) => {
+  // ✅ Register for event or club
+  const handleRegisterSubmit = async (e) => {
     e.preventDefault();
-    alert(`✅ You have successfully registered for "${eventToRegister?.title}"`);
-    setShowRegisterModal(false);
-    setForm({
-      fullName: "",
-      email: "",
-      regno: "",
-      department: "",
-      year: "",
-      section: "",
-    });
+    
+    try {
+      const registrationData = {
+        ...form,
+        type: activeTab === "events" ? "event" : "club",
+        itemId: eventToRegister._id,
+        itemTitle: eventToRegister.title,
+      };
+
+      const response = await createRegistration(registrationData);
+      alert(`✅ ${response.data.message}`);
+      
+      setShowRegisterModal(false);
+      setForm({
+        fullName: "",
+        email: "",
+        regno: "",
+        department: "",
+        year: "",
+        section: "",
+      });
+    } catch (error) {
+      console.error("Registration error:", error);
+      const errorMsg = error.response?.data?.message || "Registration failed. Please try again.";
+      alert(`❌ ${errorMsg}`);
+    }
   };
 
   // ✅ Logout

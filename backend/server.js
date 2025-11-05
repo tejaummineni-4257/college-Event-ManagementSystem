@@ -9,6 +9,7 @@ import eventRoutes from "./routes/eventRoutes.js";
 import clubRoutes from "./routes/clubRoutes.js";
 import newsRoutes from "./routes/newsRoutes.js";
 import noticeRoutes from "./routes/noticeRoutes.js";
+import registrationRoutes from "./routes/registrationRoutes.js";
  // single file handles both register + view
 
 dotenv.config();
@@ -34,6 +35,7 @@ app.use("/api/events", eventRoutes);        // events CRUD
 app.use("/api/clubs", clubRoutes);          // clubs CRUD
 app.use("/api/news", newsRoutes);           // news CRUD
 app.use("/api/notices", noticeRoutes);      // notices CRUD
+app.use("/api/registrations", registrationRoutes); // student registrations
 
 // ✅ Default route for testing
 app.get("/", (req, res) => {

@@ -9,6 +9,9 @@ import {
   FaTrash,
   FaSignOutAlt,
   FaEdit,
+  FaClipboardList,
+  FaCheckCircle,
+  FaTimesCircle,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import "../AdminDashboard.css";
@@ -85,8 +88,24 @@ const AdminDashboard = () => {
 
   // Edit item
   const handleEdit = (item) => {
-    setFormData(item);
+    // Exclude _id and timestamps from formData
+    const { _id, createdAt, updatedAt, __v, ...editableData } = item;
+    setFormData(editableData);
     setEditId(item._id);
+    // Scroll to top so user can see the form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Update registration status
+  const handleStatusUpdate = async (id, status) => {
+    try {
+      await axios.put(`${API_BASE}/registrations/${id}`, { status });
+      alert(`Registration ${status} successfully!`);
+      fetchData();
+    } catch (error) {
+      console.error("Status update error:", error);
+      alert("Failed to update status");
+    }
   };
 
   const icons = {
@@ -94,6 +113,7 @@ const AdminDashboard = () => {
     news: <FaNewspaper color="#42a5f5" />,
     notices: <FaBullhorn color="#ef5350" />,
     clubs: <FaUsers color="#66bb6a" />,
+    registrations: <FaClipboardList color="#ab47bc" />,
   };
 
   return (
@@ -102,7 +122,7 @@ const AdminDashboard = () => {
       <div className="sidebar">
         <h2>⚙️ Admin Panel</h2>
         <ul>
-          {["events", "news", "notices", "clubs"].map((tab) => (
+          {["events", "news", "notices", "clubs", "registrations"].map((tab) => (
             <li
               key={tab}
               className={activeTab === tab ? "active" : ""}
@@ -128,7 +148,8 @@ const AdminDashboard = () => {
           {icons[activeTab]}  {activeTab.toUpperCase()}
         </h2>
 
-        {/* Form */}
+        {/* Show form only for non-registration tabs */}
+        {activeTab !== "registrations" && (
         <form className="add-form" onSubmit={handleSubmit}>
           <input
             type="text"
@@ -197,44 +218,117 @@ const AdminDashboard = () => {
             <FaPlus /> {editId ? "Update" : "Add"} {activeTab.slice(0, -1)}
           </button>
         </form>
+        )}
 
         {/* Data List */}
-        <ul className="item-list">
-          {data.length > 0 ? (
-            data.map((item) => (
-              <li key={item._id} className="item-card">
-                <div>
-                  <strong>{item.title}</strong>
-                  <p>{item.description}</p>
-                  {activeTab === "events" && (
-                    <p>
-                      <b>Date:</b> {item.date || "N/A"} | <b>Time:</b>{" "}
-                      {item.time || "N/A"} | <b>Location:</b>{" "}
-                      {item.location || "N/A"}
-                    </p>
-                  )}
-                </div>
+        {activeTab === "registrations" ? (
+          /* Registration List View */
+          <div className="registration-list">
+            {data.length > 0 ? (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Email</th>
+                    <th>Reg No</th>
+                    <th>Dept/Year</th>
+                    <th>Type</th>
+                    <th>Event/Club</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.map((reg) => (
+                    <tr key={reg._id}>
+                      <td>{reg.fullName}</td>
+                      <td>{reg.email}</td>
+                      <td>{reg.regno}</td>
+                      <td>{reg.department} / {reg.year}-{reg.section}</td>
+                      <td>
+                        <span className={`type-badge ${reg.type || 'event'}`}>
+                          {reg.type ? reg.type.toUpperCase() : "N/A"}
+                        </span>
+                      </td>
+                      <td>{reg.itemTitle}</td>
+                      <td>
+                        <span className={`status-badge ${reg.status || 'pending'}`}>
+                          {reg.status ? reg.status.toUpperCase() : "PENDING"}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="action-buttons">
+                          {reg.status !== "approved" && (
+                            <button
+                              className="btn-approve"
+                              onClick={() => handleStatusUpdate(reg._id, "approved")}
+                            >
+                              <FaCheckCircle /> Approve
+                            </button>
+                          )}
+                          {reg.status !== "rejected" && (
+                            <button
+                              className="btn-reject"
+                              onClick={() => handleStatusUpdate(reg._id, "rejected")}
+                            >
+                              <FaTimesCircle /> Reject
+                            </button>
+                          )}
+                          <button
+                            className="btn-delete"
+                            onClick={() => handleDelete(reg._id)}
+                          >
+                            <FaTrash /> Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p>No registrations available.</p>
+            )}
+          </div>
+        ) : (
+          /* Regular Item List for other tabs */
+          <ul className="item-list">
+            {data.length > 0 ? (
+              data.map((item) => (
+                <li key={item._id} className="item-card">
+                  <div>
+                    <strong>{item.title}</strong>
+                    <p>{item.description}</p>
+                    {activeTab === "events" && (
+                      <p>
+                        <b>Date:</b> {item.date || "N/A"} | <b>Time:</b>{" "}
+                        {item.time || "N/A"} | <b>Location:</b>{" "}
+                        {item.location || "N/A"}
+                      </p>
+                    )}
+                  </div>
 
-                <div className="item-actions">
-                  <button
-                    className="edit-btn"
-                    onClick={() => handleEdit(item)}
-                  >
-                    <FaEdit /> Edit
-                  </button>
-                  <button
-                    className="delete-btn"
-                    onClick={() => handleDelete(item._id)}
-                  >
-                    <FaTrash /> Delete
-                  </button>
-                </div>
-              </li>
-            ))
-          ) : (
-            <p>No {activeTab} available.</p>
-          )}
-        </ul>
+                  <div className="item-actions">
+                    <button
+                      className="edit-btn"
+                      onClick={() => handleEdit(item)}
+                    >
+                      <FaEdit /> Edit
+                    </button>
+                    <button
+                      className="delete-btn"
+                      onClick={() => handleDelete(item._id)}
+                    >
+                      <FaTrash /> Delete
+                    </button>
+                  </div>
+                </li>
+              ))
+            ) : (
+              <p>No {activeTab} available.</p>
+            )}
+          </ul>
+        )}
       </div>
     </div>
   );
