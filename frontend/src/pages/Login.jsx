@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { FaGraduationCap, FaEnvelope, FaLock, FaUserShield, FaSignInAlt } from "react-icons/fa";
-import "../Auth.css"; // styling file
+import "../Auth.css";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -22,7 +22,7 @@ const Login = () => {
     e.preventDefault();
     try {
       const res = await axios.post(
-        "https://college-event-management-system-dvr3.onrender.com/api/users/login",
+        "http://localhost:5000/api/users/login", // 👈 Local backend URL
         formData
       );
 

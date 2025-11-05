@@ -9,18 +9,25 @@ import eventRoutes from "./routes/eventRoutes.js";
 import clubRoutes from "./routes/clubRoutes.js";
 import newsRoutes from "./routes/newsRoutes.js";
 import noticeRoutes from "./routes/noticeRoutes.js";
-import registrationRoutes from "./routes/registrationRoutes.js";
- // single file handles both register + view
+import registrationRoutes from "./routes/registrationRoutes.js"; // register + view
 
 dotenv.config();
 
 const app = express();
 
-// ✅ Middlewares
-app.use(cors());
+// ✅ Middleware
 app.use(express.json());
 
-// ✅ MongoDB Connection
+// ✅ CORS setup (only for local development)
+app.use(
+  cors({
+    origin: "http://localhost:3000", // your frontend (React) runs here
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true,
+  })
+);
+
+// ✅ MongoDB Connection (local or Atlas)
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -30,18 +37,18 @@ mongoose
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 // ✅ API Routes
-app.use("/api/users", userRoutes);          // user login/register
-app.use("/api/events", eventRoutes);        // events CRUD
-app.use("/api/clubs", clubRoutes);          // clubs CRUD
-app.use("/api/news", newsRoutes);           // news CRUD
-app.use("/api/notices", noticeRoutes);      // notices CRUD
-app.use("/api/registrations", registrationRoutes); // student registrations
+app.use("/api/users", userRoutes);
+app.use("/api/events", eventRoutes);
+app.use("/api/clubs", clubRoutes);
+app.use("/api/news", newsRoutes);
+app.use("/api/notices", noticeRoutes);
+app.use("/api/registrations", registrationRoutes);
 
-// ✅ Default route for testing
+// ✅ Test Route
 app.get("/", (req, res) => {
-  res.send("🎯 College Event Management Backend is running...");
+  res.send("🎯 College Event Management Backend is running locally...");
 });
 
-// ✅ Start server
+// ✅ Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
